@@ -1,6 +1,7 @@
 # PiWebSocket
 A Websocket Client & Echo Server to stream pi as it is calculated to the internets
--Requires
+
+- Requires
     - AutobahnPython
     - python-gmpy
     - python-ujson

@@ -18,57 +18,49 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
     $ python setup.py install
     #if setup.py fails on gmp.h install: apt-get install python-gmpy
 
-#Usage
-- Commandline
-    python -m PiWebSocket [-h] [--debug] {echo,calc,stream} ...
+#Commandline Usage
 
-    positional arguments:
+        python -m PiWebSocket [-h] [--debug] {echo,calc,stream} ...
+
+        positional arguments:
     
-      {echo,calc,stream}  service type
-      
-        echo    start echo websocket service
-        
-        calc    start calc websocket service
-        
-        stream  connect to echo websocket and stream restults
-
-    optional arguments:
-      -h, --help          show this help message and exit
-      --debug, -d         debug
+                {echo,calc,stream}  service type
+              
+                    echo    start echo websocket service
+                    calc    start calc websocket service
+                    stream  connect to echo websocket and stream restults
+                
+                optional arguments:
+                    -h, --help          show this help message and exit
+                    --debug, -d         debug
 
 
-    - Stream Digits from Echo Server:
+- Stream Digits from Echo Server:
     
         python PiWebSocket stream [-h] [--address ADDRESS] [--port PORT] [--statsonly]
 
         optional arguments:
-          -h, --help            show this help message and exit
-          
-          --address ADDRESS, -a ADDRESS
-                                address
-          --port PORT, -p PORT  port number to host echo service on
-          
-          --statsonly, -s       show only 1000th digit stats
+            -h, --help            show this help message and exit
+            --address ADDRESS, -a ADDRESS
+            --port PORT, -p PORT  port number to host echo service on
+            --statsonly, -s       show only 1000th digit stats
 
 
-    - Start WebSocket Echo Server
+- Start WebSocket Echo Server
     
         python PiWebSocket echo [-h] [--port [PORT]]
 
         optional arguments:
-          -h, --help            show this help message and exit
-          
-          --port [PORT], -p [PORT]
+            -h, --help            show this help message and exit
+            --port [PORT], -p [PORT]
 
-    - Start Pi Calculation Client
+- Start Pi Calculation Client
+
         python PiWebSocket calc [-h] [--address ADDRESS] [--name NAME] [--port [PORT]]
 
         optional arguments:
           -h, --help            show this help message and exit
-          
           --address ADDRESS, -a ADDRESS
-          
           --name NAME, -n NAME  your pi's name
-          
           --port [PORT], -p [PORT]
 

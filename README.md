@@ -23,10 +23,14 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
     python -m PiWebSocket [-h] [--debug] {echo,calc,stream} ...
 
     positional arguments:
+    
       {echo,calc,stream}  service type
-        echo              start echo websocket service
-        calc              start calc websocket service
-        stream            connect to echo websocket and stream restults
+      
+        echo    start echo websocket service
+        
+        calc    start calc websocket service
+        
+        stream  connect to echo websocket and stream restults
 
     optional arguments:
       -h, --help          show this help message and exit
@@ -34,21 +38,26 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
 
 
     - Stream Digits from Echo Server:
+    
         python PiWebSocket stream [-h] [--address ADDRESS] [--port PORT] [--statsonly]
 
         optional arguments:
           -h, --help            show this help message and exit
+          
           --address ADDRESS, -a ADDRESS
                                 address
           --port PORT, -p PORT  port number to host echo service on
+          
           --statsonly, -s       show only 1000th digit stats
 
 
     - Start WebSocket Echo Server
+    
         python PiWebSocket echo [-h] [--port [PORT]]
 
         optional arguments:
           -h, --help            show this help message and exit
+          
           --port [PORT], -p [PORT]
 
     - Start Pi Calculation Client
@@ -56,8 +65,10 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
 
         optional arguments:
           -h, --help            show this help message and exit
+          
           --address ADDRESS, -a ADDRESS
-                                address
+          
           --name NAME, -n NAME  your pi's name
+          
           --port [PORT], -p [PORT]
 

@@ -37,7 +37,7 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
 
 - Stream Digits from Echo Server:
     
-        python PiWebSocket stream [-h] [--address ADDRESS] [--port PORT] [--statsonly]
+        python -m PiWebSocket stream [-h] [--address ADDRESS] [--port PORT] [--statsonly]
 
         optional arguments:
             -h, --help            show this help message and exit
@@ -48,7 +48,7 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
 
 - Start WebSocket Echo Server
     
-        python PiWebSocket echo [-h] [--port [PORT]]
+        python -m PiWebSocket echo [-h] [--port [PORT]]
 
         optional arguments:
             -h, --help            show this help message and exit
@@ -56,7 +56,7 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
 
 - Start Pi Calculation Client
 
-        python PiWebSocket calc [-h] [--address ADDRESS] [--name NAME] [--port [PORT]]
+        python -m PiWebSocket calc [-h] [--address ADDRESS] [--name NAME] [--port [PORT]]
 
         optional arguments:
           -h, --help            show this help message and exit

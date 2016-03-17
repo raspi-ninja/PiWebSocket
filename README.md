@@ -13,7 +13,6 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
    ws://localhost:8081/ws_pi
 
 #Setup
-.. code-block:: console
     $ git clone https://github.com/raspi-ninja/PiWebSocket.git
     $ cd PiWebSocket
     $ python setup.py install

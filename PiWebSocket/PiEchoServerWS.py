@@ -5,48 +5,40 @@ License: Meh.. just remember me when you make your millions off this ;-)
 Description:
     WebSocket Echo Server for raspberry pi clients sending their pi calcs.  Handles the connection load of clients
     looking at the stream.
-    - Client Connects to ws://url:9000/ws_pi
+    - Client Connects to ws://url:8081/ws_pi
     - Pi Calculating Client connects to ws://url:9000/ws_pi?pi
-    V0.1.2
+    V0.1.3
 """
 
-import json,sys,base64
-import os
-
-from twisted.internet import reactor, ssl
-from twisted.python import log
-from twisted.python.modules import getModule
-from twisted.web.server import Site
-from twisted.web.static import File
-from autobahn.twisted.websocket import WebSocketServerFactory, WebSocketServerProtocol
+import ujson as json
 from autobahn.twisted.resource import WebSocketResource
-
 from autobahn.twisted.websocket import WebSocketServerProtocol, \
-    WebSocketServerFactory,listenWS
+    WebSocketServerFactory, listenWS
+from twisted.internet import reactor
 
 
 class DataObj(object):
     def __init__(self, d={}):
         for a, b in d.items():
             if isinstance(b, (list, tuple)):
-               setattr(self, a, [DataObj(x) if isinstance(x, dict) else x for x in b])
+                setattr(self, a, [DataObj(x) if isinstance(x, dict) else x for x in b])
             else:
-               setattr(self, a, DataObj(b) if isinstance(b, dict) else b)
+                setattr(self, a, DataObj(b) if isinstance(b, dict) else b)
         pass
 
     def __getattr__(self, item):
         try:
             return super(DataObj, self).__getattribute__(item)
         except AttributeError:
-            setattr(self,item,None)
+            setattr(self, item, None)
             return super(DataObj, self).__getattribute__(item)
 
 
 class Stats(object):
     pass
 
-class PiServerProtocol(WebSocketServerProtocol):
 
+class PiServerProtocol(WebSocketServerProtocol):
     def onOpen(self):
         header = self.http_headers
         if header.has_key('piclient'):
@@ -56,7 +48,7 @@ class PiServerProtocol(WebSocketServerProtocol):
             self.factory.register(self)
 
     def onConnect(self, request):
-        #print request
+        # print request
         pass
 
     def onMessage(self, payload, isBinary):
@@ -68,7 +60,7 @@ class PiServerProtocol(WebSocketServerProtocol):
                 self.factory.broadcast({
                     "piclient": self.device,
                     "stats": {
-                        "startTime":self.stats.startTime
+                        "startTime": self.stats.startTime
                     }
                 })
             if data.countdown:
@@ -81,12 +73,12 @@ class PiServerProtocol(WebSocketServerProtocol):
                         self.stats.digitcounts[num] = 1
 
             newpayload = {
-                            "device": self.device,
-                            # "digits": data.digits,
-                            "dpm": data.dpm,
-                            "digitcount": data.digitcount,
-                            # "digitcounts": self.stats.digitcounts
-                        }
+                "device": self.device,
+                # "digits": data.digits,
+                "dpm": data.dpm,
+                "digitcount": data.digitcount,
+                # "digitcounts": self.stats.digitcounts
+            }
             if data.mark:
                 self.stats.digits_history.append(data.mark.__dict__)
                 if data.dpm:
@@ -101,7 +93,7 @@ class PiServerProtocol(WebSocketServerProtocol):
         else:
             try:
                 data = DataObj(json.loads(payload))
-                #print data.__dict__
+                # print data.__dict__
                 if json.loads(payload).has_key("showpi"):
                     self.showpi = data.showpi
 
@@ -111,6 +103,7 @@ class PiServerProtocol(WebSocketServerProtocol):
 
     def onClose(self, wasClean, code, reason):
         self.factory.unregister(self)
+
 
 class BroadcastServerFactory(WebSocketServerFactory):
     def __init__(self, url, debug=True):
@@ -134,10 +127,10 @@ class BroadcastServerFactory(WebSocketServerFactory):
             client.showpi = False
             self.clients.append(client)
             for piclient in self.piClients:
-                newclientdata={
+                newclientdata = {
                     "piclient": piclient.device,
                     "stats": {
-                        "startTime":piclient.stats.startTime
+                        "startTime": piclient.stats.startTime
                     }
                 }
                 print newclientdata
@@ -148,27 +141,27 @@ class BroadcastServerFactory(WebSocketServerFactory):
         if client in self.clients:
             self.clients.remove(client)
             self.clientChange()
-        if(client in self.piClients):
+        if (client in self.piClients):
             self.piClients.remove(client)
 
     def clientChange(self):
         self.broadcast({"connectedClients": len(self.clients)})
 
-    def broadcast(self, msg,digits="",digitcounts={}):
-        #prepared_msg = self.prepareMessage((msg),isBinary=False)
-        #print msg
+    def broadcast(self, msg, digits="", digitcounts={}):
+        # prepared_msg = self.prepareMessage((msg),isBinary=False)
+        # print msg
         for c in self.clients:
             data = msg
             if c.showpi:
-                msg["digits"] = digits
+                data["digits"] = digits
             else:
-                #print data['digits']
-                msg["digitcounts"] = digitcounts
+                # print data['digits']
+                data["digitcounts"] = digitcounts
             c.sendMessage(json.dumps(data))
 
 
 if __name__ == '__main__':
-    factory80 = BroadcastServerFactory(u"ws://localhost:9000/ws_pi")
+    factory80 = BroadcastServerFactory(u"ws://localhost:8081/ws_pi")
     factory80.protocol = PiServerProtocol
     resource80 = WebSocketResource(factory80)
     listenWS(factory80)

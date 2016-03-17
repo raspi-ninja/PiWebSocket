@@ -1,14 +1,16 @@
-from distutils.core import setup
+try:
+    from setuptools import setup
+except:
+    from distutils.core import setup
 
 setup(
         name='Pi Calc Stream',
-        version='0.1.1',
-        packages=[''],
-        url='http://www.raspi-ninja.com',
+        version='0.1.4.0',
+        url='https://github.com/raspi-ninja/PiWebSocket',
         license='meh',
         author='Nate',
         author_email='masterninja@raspi-ninja.com',
         description="Stream pi realtime as it's calculated through the Websocket Echo Server to Other Clients'",
-        requires=["autobahn","gmpy","twisted","ujson"]
-    )
-
+        packages=["PiWebSocket"],
+        install_requires=["gmpy", "ujson", "autobahn[twisted]>=0.11.0", "twisted", "txaio"]
+)

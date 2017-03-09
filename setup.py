@@ -12,5 +12,5 @@ setup(
         author_email='masterninja@raspi-ninja.com',
         description="Stream pi realtime as it's calculated through the Websocket Echo Server to Other Clients'",
         packages=["PiWebSocket"],
-        install_requires=["gmpy", "ujson", "autobahn[twisted]>=0.11.0", "twisted", "txaio"]
+        install_requires=["gmpy2", "ujson", "autobahn[twisted]>=0.11.0", "twisted", "txaio"]
 )

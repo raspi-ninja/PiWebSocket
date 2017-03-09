@@ -10,7 +10,7 @@ Description:
 """
 
 import time
-from gmpy import mpz
+from gmpy2 import mpz,add,div,sub,mul
 
 from autobahn.twisted.websocket import WebSocketClientProtocol, WebSocketClientFactory, connectWS
 from twisted.internet import reactor, ssl
@@ -45,10 +45,13 @@ def pi_calc():
     elapsedStart = time.time()
     while loop:
         digitCalcTime = time.time()
-        u, y = mpz(3 * (3 * j + 1) * (3 * j + 2)), mpz((q * (27 * j - 12) + 5 * r) / (5 * t))
+        j3 = mul(3, j)
+        u, y = mpz(3 * (j3 + 1) * (j3 + 2)), mpz(div((add(mul(q, (mul(27, j)) - 12) , mul(5, r))), mul(5, t)))
         strPi = str(y)
         digitstring += strPi
-        q, r, t, j = mpz((20 * j ** 2 - 10 * j) * q), mpz(10 * u * (q * (5 * j - 2) + r - y * t)), mpz(t * u), j + 1
+        q, r, t, j = mpz(mul((20 * j ** 2 - mul(10, j)), q)), \
+                     mpz(mul(mul(10, u), (q * (mul(5, j) - 2) + r - mul(y, t)))), \
+                     mpz(mul(t, u)), add(j, 1)
         # dpm = digits per minute
         now = time.time()
         elapsed = now - elapsedStart

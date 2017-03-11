@@ -16,7 +16,6 @@ from PiEchoServerWS import PiServerProtocol
 from PiEchoServerWS import BroadcastServerFactory
 from PiCalcClientWS import PiWebSocketFactory
 from PiCalcClientWS import PiWebSocketProtocol
-from PiEchoServerWS import DataObj
 
 def showdebug(msg):
     print msg

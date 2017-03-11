@@ -15,23 +15,7 @@ from autobahn.twisted.resource import WebSocketResource
 from autobahn.twisted.websocket import WebSocketServerProtocol, \
     WebSocketServerFactory, listenWS
 from twisted.internet import reactor
-
-
-class DataObj(object):
-    def __init__(self, d={}):
-        for a, b in d.items():
-            if isinstance(b, (list, tuple)):
-                setattr(self, a, [DataObj(x) if isinstance(x, dict) else x for x in b])
-            else:
-                setattr(self, a, DataObj(b) if isinstance(b, dict) else b)
-        pass
-
-    def __getattr__(self, item):
-        try:
-            return super(DataObj, self).__getattribute__(item)
-        except AttributeError:
-            setattr(self, item, None)
-            return super(DataObj, self).__getattribute__(item)
+from bunch import bunchify
 
 
 class Stats(object):
@@ -53,49 +37,54 @@ class PiServerProtocol(WebSocketServerProtocol):
 
     def onMessage(self, payload, isBinary):
         if self in self.factory.piClients:
-            data = DataObj(json.loads(payload))
+            data = json.loads(payload)
+            newpayload = {
+                "device": self.device
+            }
             ws_url = self.http_request_uri
-            if data.startTime:
-                self.stats.startTime = data.startTime
-                self.factory.broadcast({
-                    "piclient": self.device,
-                    "stats": {
-                        "startTime": self.stats.startTime
-                    }
-                })
-            if data.countdown:
+            # if data.has_key('startTime'):
+            #     self.stats.startTime = data['startTime']
+            #     self.factory.broadcast({
+            #         "device": self.device,
+            #         "stats": {
+            #             "startTime": self.stats.startTime
+            #         }
+            #     })
+            if data.has_key('countdown'):
                 self.factory.broadcast(data.__dict__)
-            if data.digits:
-                for num in data.digits:
+            if data.has_key('digits'):
+                newpayload['digits'] = data['digits']
+                for num in data['digits']:
                     if self.stats.digitcounts.has_key(num):
                         self.stats.digitcounts[num] += 1
                     else:
                         self.stats.digitcounts[num] = 1
 
-            newpayload = {
-                "device": self.device,
-                # "digits": data.digits,
-                "dpm": data.dpm,
-                "digitcount": data.digitcount,
-                # "digitcounts": self.stats.digitcounts
-            }
-            if data.mark:
-                self.stats.digits_history.append(data.mark.__dict__)
-                if data.dpm:
-                    self.stats.dpm_history.append({data.mark.runtime: data.dps})
+            if data.has_key('digitcount'):
+                newpayload['digitcount'] = data['digitcount']
+            if data.has_key('elapsed'):
+                newpayload['elapsed'] = data['elapsed']
+            if data.has_key('mark'):
+                self.stats.digits_history.append(data['mark'])
+                if data.has_key('dpm'):
+                    mark = data['mark']
+                    self.stats.dpm_history.append(mark)
                 newpayload['mark'] = {
-                    "dps": data.dps,
-                    "digitmark": data.mark.digitmark,
-                    "time": data.mark.runtime
+                    "device": self.device,
+                    "dps": data['dps'],
+                    "digitmark": data['mark']['digitmark'],
+                    "time": data['mark']['runtime']
                 }
-            if data.dpm:
-                self.factory.broadcast(newpayload, data.digits, self.stats.digitcounts)
+            if data.has_key('dpm'):
+                self.stats.dpm_history.append(data['dpm'])
+            if data.has_key('digits'):
+                self.factory.broadcast(newpayload, data['digits'], self.stats.digitcounts)
         else:
             try:
-                data = DataObj(json.loads(payload))
+                data = json.loads(payload)
                 # print data.__dict__
                 if json.loads(payload).has_key("showpi"):
-                    self.showpi = data.showpi
+                    self.showpi = data['showpi']
 
             except Exception as e:
                 print e
@@ -110,6 +99,18 @@ class BroadcastServerFactory(WebSocketServerFactory):
         WebSocketServerFactory.__init__(self, url)
         self.clients = []
         self.piClients = []
+        reactor.callLater(1, self.sendStats)
+
+    def sendStats(self):
+        if len(self.piClients) > 0:
+            stats = []
+            for client in self.piClients:
+                name = client.device
+                stats.append({'device': name,
+                              'digits_history': client.stats.digits_history})
+            for c in self.clients:
+                c.sendMessage(json.dumps({'pistats': stats}))
+        reactor.callLater(1, self.sendStats)
 
     def registerPiServer(self, PiClient):
         PiClient.stats = Stats()
@@ -119,8 +120,9 @@ class BroadcastServerFactory(WebSocketServerFactory):
         PiClient.stats.digit_count = 0
         PiClient.stats.dpm_history = []
         PiClient.device = PiClient.http_headers['piclient']
-        self.piClients.append(PiClient)
-        print 'welcome :', PiClient.http_headers['piclient']
+        if(PiClient not in self.piClients):
+            self.piClients.append(PiClient)
+            print 'welcome :', PiClient.http_headers['piclient']
 
     def register(self, client):
         if client not in self.clients:
@@ -128,7 +130,7 @@ class BroadcastServerFactory(WebSocketServerFactory):
             self.clients.append(client)
             for piclient in self.piClients:
                 newclientdata = {
-                    "piclient": piclient.device,
+                    "device": piclient.device,
                     "stats": {
                         "startTime": piclient.stats.startTime
                     }
@@ -155,13 +157,13 @@ class BroadcastServerFactory(WebSocketServerFactory):
             if c.showpi:
                 data["digits"] = digits
             else:
-                # print data['digits']
+                # print digitcounts
                 data["digitcounts"] = digitcounts
             c.sendMessage(json.dumps(data))
 
 
 if __name__ == '__main__':
-    factory80 = BroadcastServerFactory(u"ws://localhost:8081/ws_pi")
+    factory80 = BroadcastServerFactory(u"ws://localhost:8888/ws_pi")
     factory80.protocol = PiServerProtocol
     resource80 = WebSocketResource(factory80)
     listenWS(factory80)

@@ -85,7 +85,7 @@ class PiWebSocketProtocol(WebSocketClientProtocol):
             t = 1489271267.978057
             if(abs(t-time.time()) >= 6000):
                 t = 30
-            print t, 'remain'
+            print abs(t-time.time()), 'remain'
             reactor.callLater(t, self.factory.start_calculating)
             # self.factory.start_calculating()
         else:

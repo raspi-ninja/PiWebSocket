@@ -15,7 +15,6 @@ from autobahn.twisted.resource import WebSocketResource
 from autobahn.twisted.websocket import WebSocketServerProtocol, \
     WebSocketServerFactory, listenWS
 from twisted.internet import reactor
-from bunch import bunchify
 
 
 class Stats(object):

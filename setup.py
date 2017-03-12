@@ -5,7 +5,7 @@ except:
 
 setup(
         name='Pi Calc Stream',
-        version='0.1.5.2',
+        version='0.1.5.3',
         url='https://github.com/raspi-ninja/PiWebSocket',
         license='meh',
         author='Nate',

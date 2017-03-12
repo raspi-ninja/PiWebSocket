@@ -42,8 +42,8 @@ class PiServerProtocol(WebSocketServerProtocol):
             }
             ws_url = self.http_request_uri
             if data.has_key('startTime'):
-                self.stats.startTime=data['startTime']
-            #     self.stats.startTime = data['startTime']
+                self.stats.startTime = data['startTime']
+            # self.stats.startTime = data['startTime']
             #     self.factory.broadcast({
             #         "device": self.device,
             #         "stats": {
@@ -53,6 +53,8 @@ class PiServerProtocol(WebSocketServerProtocol):
             if data.has_key('countdown'):
                 newpayload['countdown'] = data['countdown']
                 self.factory.broadcast(newpayload)
+            if data.has_key('dpm'):
+                newpayload['dpm'] = data['dpm']
             if data.has_key('digits'):
                 newpayload['digits'] = data['digits']
                 for num in data['digits']:
@@ -121,7 +123,7 @@ class BroadcastServerFactory(WebSocketServerFactory):
         PiClient.stats.digit_count = 0
         PiClient.stats.dpm_history = []
         PiClient.device = PiClient.http_headers['piclient']
-        if(PiClient not in self.piClients):
+        if (PiClient not in self.piClients):
             self.piClients.append(PiClient)
             print 'welcome :', PiClient.http_headers['piclient']
 
@@ -157,9 +159,9 @@ class BroadcastServerFactory(WebSocketServerFactory):
             data = msg
             if c.showpi:
                 data["digits"] = digits
-            else:
-                # print digitcounts
-                data["digitcounts"] = digitcounts
+            # else:
+            #     # print digitcounts
+            #     data["digitcounts"] = digitcounts
             c.sendMessage(json.dumps(data))
 
 

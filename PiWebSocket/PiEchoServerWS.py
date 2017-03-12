@@ -41,7 +41,8 @@ class PiServerProtocol(WebSocketServerProtocol):
                 "device": self.device
             }
             ws_url = self.http_request_uri
-            # if data.has_key('startTime'):
+            if data.has_key('startTime'):
+                self.stats.startTime=data['startTime']
             #     self.stats.startTime = data['startTime']
             #     self.factory.broadcast({
             #         "device": self.device,
@@ -50,7 +51,8 @@ class PiServerProtocol(WebSocketServerProtocol):
             #         }
             #     })
             if data.has_key('countdown'):
-                self.factory.broadcast(data.__dict__)
+                newpayload['countdown'] = data['countdown']
+                self.factory.broadcast(newpayload)
             if data.has_key('digits'):
                 newpayload['digits'] = data['digits']
                 for num in data['digits']:

@@ -82,18 +82,29 @@ class PiWebSocketProtocol(WebSocketClientProtocol):
     def onOpen(self):
         if not self.factory.running_calc:
             mar14_2017 = 1489449600
-            t = 1489273590.288839-time.time()
+            self.testTime = 1489278638.22434
+            t = self.testTime - time.time()
+            self.t = t
             if t >= 6000:
                 t = 30
-            if t<0:
-                t = (1489273590+300)-time.time()
+            if t < 0:
+                t = (time.time() + 30) - time.time()
+
             print t, 'remain'
             reactor.callLater(t, self.factory.start_calculating)
+            reactor.callLater(1, self.update)
             # self.factory.start_calculating()
         else:
             self.sendMessage(json.dumps({"startTime": time.time()}))
 
         pass
+
+    def update(self):
+        t = self.testTime - time.time()
+        print t,'remain'
+        self.sendMessage(json.dumps({"countdown": t}))
+        if (t > 0):
+            reactor.callLater(1, self.update)
 
     def onMessage(self, payload, isBinary):
         pass
@@ -122,6 +133,7 @@ class PiWebSocketFactory(WebSocketClientFactory, ReconnectingClientFactory):
         self.startTime = time.time()
         self.getDigit()
         self.running_calc = 1
+        self.sendMessage(json.dumps({"startTime": time.time()}))
         # if not self.running_calc and self.testMark - time.time() <= 0:
         #     self.sendMessage(json.dumps({"startTime": time.time()}))
         #     startTime = time.time()

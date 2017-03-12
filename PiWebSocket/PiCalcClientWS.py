@@ -56,7 +56,7 @@ def pi_calc():
         now = time.time()
         elapsed = now - elapsedStart
         # if the elapsed calculation time exceeds .5 seconds break the loop and return the digits calculated
-        if elapsed >= .1:
+        if elapsed >= .5:
             break
         elif (j - 2) % 1000 == 0:  # break also every 1000nth digit to report stats
             break
@@ -154,7 +154,6 @@ class PiWebSocketFactory(WebSocketClientFactory, ReconnectingClientFactory):
         elapsed = time.time() - self.startTime
         digits['elapsed'] = elapsed
         self.sendMessage(json.dumps(digits))
-        time.sleep(1)
         self.getDigit()
 
 

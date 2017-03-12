@@ -16,7 +16,8 @@ A WebSocket Client & Echo Server to stream pi as it is calculated to the interne
     $ git clone https://github.com/raspi-ninja/PiWebSocket.git
     $ cd PiWebSocket
     $ python setup.py install
-    #if setup.py fails on gmp.h install: apt-get install python-gmpy
+    #if setup.py fails try installing: 
+        sudo apt-get install python-dev libssl-dev libmpfr-dev libmpc-dev libgmp3-dev libffi-dev
 
 #Commandline Usage
 

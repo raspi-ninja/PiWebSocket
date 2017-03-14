@@ -56,7 +56,7 @@ def pi_calc():
         now = time.time()
         elapsed = now - elapsedStart
         # if the elapsed calculation time exceeds .5 seconds break the loop and return the digits calculated
-        if elapsed >= .5:
+        if elapsed >= 1:
             break
         elif (j - 2) % 1000 == 0:  # break also every 1000nth digit to report stats
             break
@@ -81,15 +81,16 @@ class PiWebSocketProtocol(WebSocketClientProtocol):
 
     def onOpen(self):
         if not self.factory.running_calc:
-            mar14_2017 = 1489449600
-            self.testTime = 1489278638.22434
+            mar14_2017 = 1489460400
+            # self.testTime = 1489278638.22434
+            self.testTime = mar14_2017
             t = self.testTime - time.time()
+
             self.t = t
             if t >= 6000:
                 t = 30
             if t < 0:
                 t = (time.time() + 30) - time.time()
-
             print t, 'remain'
             reactor.callLater(t, self.factory.start_calculating)
             reactor.callLater(1, self.update)
